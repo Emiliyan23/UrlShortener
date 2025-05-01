@@ -15,6 +15,7 @@ builder.Services.AddCors(options =>
 	options.AddPolicy("AllowVueFrontend", policy =>
 	{
 		policy.WithOrigins("https://emiliyanvasilev.net")
+			.WithOrigins("https://www.emiliyanvasilev.net")
 			.AllowAnyHeader()
 			.AllowAnyMethod();
 	});

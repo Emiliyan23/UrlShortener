@@ -36,7 +36,7 @@
 			try
 			{
 				string base62 = await _shortenerService.ShortenUrl(request.Url);
-				string shortenedUrl = $"{_baseUrl}/short/{base62}";
+				string shortenedUrl = $"{_baseUrl}/{base62}";
 				return Ok(new { ShortenedUrl = shortenedUrl });
 			}
 			catch (Exception e)
