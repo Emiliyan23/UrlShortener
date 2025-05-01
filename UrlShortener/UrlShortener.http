@@ -1,0 +1,6 @@
+@UrlShortener_HostAddress = http://localhost:5011
+
+POST {{UrlShortener_HostAddress}}/api/shorten
+Accept: application/json
+
+###
