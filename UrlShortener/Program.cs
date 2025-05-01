@@ -14,7 +14,7 @@ builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowVueFrontend", policy =>
 	{
-		policy.WithOrigins("http://localhost:5173")
+		policy.WithOrigins("https://gentle-sand-0ab6bc403.6.azurestaticapps.net")
 			.AllowAnyHeader()
 			.AllowAnyMethod();
 	});
