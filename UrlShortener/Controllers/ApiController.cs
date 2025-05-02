@@ -11,13 +11,16 @@
 		private readonly IShortenService _shortenerService;
 		private readonly IConfiguration _configuration;
 		private readonly string _baseUrl;
+		private readonly ILogger _logger;
 
-		public ApiController(IShortenService shortenerService, IConfiguration configuration)
+		public ApiController(IShortenService shortenerService, IConfiguration configuration, ILogger logger)
 		{
+			_logger = logger;
 			_shortenerService = shortenerService;
 			_configuration = configuration;
-			_baseUrl = _configuration["AppSettings:ShortenerBaseUrl"] ?? throw new InvalidOperationException("ShortenerBaseUrl not configured");
-			_baseUrl = _baseUrl.TrimEnd('/');
+			string baseUrlFromConfig = _configuration["AppSettings:ShortenerBaseUrl"] ?? throw new InvalidOperationException("ShortenerBaseUrl not configured");
+			baseUrlFromConfig = baseUrlFromConfig.TrimEnd('/');
+			_logger.LogWarning("Shortener Base URL read from configuration: {BaseUrl}", baseUrlFromConfig);
 		}
 
 		[HttpPost("shorten")]
