@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using UrlShortener.Infrastructure;
 using UrlShortener.Services;
@@ -30,16 +31,28 @@ builder.Services.AddDbContext<UrlShortenerDbContext>(options =>
 
 var app = builder.Build();
 
-app.UseCors("AllowVueFrontend");
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+	// Trust headers sent by the Azure frontend
+	ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+else
+{
+	app.UseHsts();
+}
 
 app.UseHttpsRedirection();
-app.UseHsts();
+
+app.UseRouting();
+
+app.UseCors("AllowVueFrontend");
 
 app.UseAuthorization();
 
