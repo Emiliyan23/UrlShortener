@@ -28,22 +28,22 @@ builder.Services.AddRateLimiter(options =>
 {
 	options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
 	{
-		if (context.Request.Method.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase))
+		if (context.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
 		{
-			return RateLimitPartition.GetFixedWindowLimiter("OPTIONS", _ => new FixedWindowRateLimiterOptions
+			string clientIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+			return RateLimitPartition.GetFixedWindowLimiter(clientIp, key => new FixedWindowRateLimiterOptions
 			{
-				PermitLimit = int.MaxValue, // Allow nearly unlimited requests for OPTIONS
-				Window = TimeSpan.FromSeconds(1),
+				PermitLimit = 1,
+				Window = TimeSpan.FromMinutes(1),
 				QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
 				QueueLimit = 0,
 			});
 		}
 
-		string clientIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-		return RateLimitPartition.GetFixedWindowLimiter(clientIp, key => new FixedWindowRateLimiterOptions
+		return RateLimitPartition.GetFixedWindowLimiter("NotPost", _ => new FixedWindowRateLimiterOptions
 		{
-			PermitLimit = 1,
-			Window = TimeSpan.FromMinutes(1),
+			PermitLimit = int.MaxValue,
+			Window = TimeSpan.FromSeconds(1),
 			QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
 			QueueLimit = 0,
 		});
