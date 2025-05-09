@@ -6,21 +6,13 @@
 	using Services;
 
 	[ApiController]
-	public class ApiController : ControllerBase
+	public class ApiController : BaseController
 	{
 		private readonly IShortenService _shortenerService;
-		private readonly IConfiguration _configuration;
-		private readonly string _baseUrl;
-		private readonly ILogger<ApiController> _logger;
 
-		public ApiController(IShortenService shortenerService, IConfiguration configuration, ILogger<ApiController> logger)
+		public ApiController(IShortenService shortenerService, IConfiguration configuration) : base(configuration)
 		{
-			_logger = logger;
 			_shortenerService = shortenerService;
-			_configuration = configuration;
-			_baseUrl = _configuration["AppSettings:ShortenerBaseUrl"] ?? throw new InvalidOperationException("ShortenerBaseUrl not configured");
-			_logger.LogWarning("Shortener Base URL read from configuration: {BaseUrl}", _baseUrl);
-			_baseUrl = _baseUrl.TrimEnd('/');
 		}
 
 		[HttpPost("shorten")]
@@ -34,6 +26,13 @@
 			if (!Uri.TryCreate(request.Url, UriKind.Absolute, out Uri? uriResult))
 			{
 				return BadRequest("Invalid URL format.");
+			}
+
+			if (BlockedDomains.Any(domain =>
+				    string.Equals(uriResult.Host, domain, StringComparison.OrdinalIgnoreCase) ||
+				    uriResult.Host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase)))
+			{
+				return BadRequest("URLs from this domain are not accepted.");
 			}
 
 			try

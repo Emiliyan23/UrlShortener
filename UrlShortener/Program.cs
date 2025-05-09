@@ -17,6 +17,7 @@ builder.Services.AddCors(options =>
 	{
 		policy.WithOrigins("https://emiliyanvasilev.net")
 			.WithOrigins("https://www.emiliyanvasilev.net")
+			.WithOrigins("http://localhost:5173")
 			.AllowAnyHeader()
 			.AllowAnyMethod();
 	});

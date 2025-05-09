@@ -1,20 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using UrlShortener.Services;
-
-namespace UrlShortener.Controllers
+﻿namespace UrlShortener.Controllers
 {
+	using Microsoft.AspNetCore.Mvc;
+
+	[ApiController]
 	public class BaseController : ControllerBase
 	{
-		private readonly IShortenService _shortenerService;
-		private readonly IConfiguration _configuration;
-		private readonly string _baseUrl;
+		protected readonly IConfiguration _configuration;
+		protected readonly string _baseUrl;
+		protected readonly string[] BlockedDomains;
 
-		public BaseController(IShortenService shortenerService, IConfiguration configuration)
+		protected BaseController(IConfiguration configuration)
 		{
-			_shortenerService = shortenerService;
 			_configuration = configuration;
-			_baseUrl = _configuration["AppSettings:ShortenerBaseUrl"] ?? throw new InvalidOperationException("ShortenerBaseUrl not configured");
+			_baseUrl = _configuration["AppSettings:ShortenerBaseUrl"] 
+			           ?? throw new InvalidOperationException("ShortenerBaseUrl not configured");
 			_baseUrl = _baseUrl.TrimEnd('/');
+			BlockedDomains = _configuration.GetSection("AppSettings:BlockedDomains").Get<string[]>();
+			if (BlockedDomains == null || BlockedDomains.Length == 0)
+			{
+				throw new InvalidOperationException("BlockedDomains not configured");
+			}
 		}
 	}
 }
